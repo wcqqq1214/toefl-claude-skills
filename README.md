@@ -7,7 +7,7 @@
 
 ## 这是什么
 
-7 个 [Claude Code Skill](https://docs.claude.com/en/docs/claude-code/skills) + 1 个 Dashboard + 脚本工具链，构成一个完整的托福备考助手：
+6 个 [Claude Code Skill](https://docs.claude.com/en/docs/claude-code/skills) + 1 个 Dashboard + 脚本工具链，构成一个完整的托福备考助手：
 
 | Skill | 干啥 | 触发词 |
 |-------|------|--------|
@@ -18,7 +18,8 @@
 | `/toefl-speaking` | 4 个 Task 模板 + 笔记框架 + 批改 | 「口语模板」「Task 3 准备」 |
 | `/toefl-vocab` | SRS 间隔重复 + 同义替换训练 | 「背单词」「同义替换」 |
 | `/toefl-diagnose` | 数据驱动诊断 + 个人化计划 | 「我该练什么」「给我个计划」 |
-| `/toefl-dashboard` | 启动本地可视化面板 | 「打开 dashboard」 |
+
+**Dashboard**：在终端用 `bash scripts/dashboard.sh` 启动（不是 skill，直接跑）。
 
 **系统特点：**
 - 数据本地化存储在 `~/.toefl/`（纯 JSON + markdown，人类可读）
@@ -42,9 +43,9 @@
 git clone https://github.com/wcqqq1214/toefl-claude-skills.git
 cd toefl-claude-skills
 
-# 复制 7 个 skill 到 Claude Code 目录
+# 复制 6 个 skill 到 Claude Code 目录
 cp -r toefl toefl-reading toefl-listening toefl-writing toefl-speaking \
-      toefl-vocab toefl-diagnose toefl-dashboard ~/.claude/skills/
+      toefl-vocab toefl-diagnose ~/.claude/skills/
 ```
 
 ### Step 2：初始化数据目录
@@ -105,7 +106,8 @@ AI：
 ### 3. 看数据（1 分钟）
 
 ```bash
-cd dashboard && npm run dev
+bash scripts/dashboard.sh
+# 首次会自动 npm install，之后直接启动
 # 打开 http://localhost:5173
 ```
 
@@ -141,8 +143,7 @@ toefl-claude-skills/
 ├── toefl-speaking/             # 口语 4 Task 模板 + 批改
 ├── toefl-vocab/                # 词汇 SRS + 同义替换
 ├── toefl-diagnose/             # 数据分析 + 计划生成
-├── toefl-dashboard/            # Dashboard 启动器
-├── dashboard/                  # React + Vite 可视化
+├── dashboard/                  # React + Vite 可视化（用户手动启动）
 │   ├── src/
 │   │   ├── App.jsx
 │   │   ├── panels/             # 9 个面板组件
@@ -151,6 +152,7 @@ toefl-claude-skills/
 │   └── package.json
 ├── scripts/
 │   ├── init.sh                 # 初始化 ~/.toefl/
+│   ├── dashboard.sh            # 启动 Dashboard
 │   ├── backup.sh               # 打 tar.gz 备份
 │   ├── restore.sh              # 从备份恢复
 │   └── statusline.sh           # Claude Code 状态栏

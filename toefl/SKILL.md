@@ -97,7 +97,7 @@ EOF
 - 用户问 Task 1 / Task 2 独立题 / 综合口语 → 直接进 `/toefl-speaking`
 - 用户丢了听力转录 → `/toefl-listening`
 - 用户说"我该练什么" / "给我个计划" → `/toefl-diagnose`
-- 用户说"看看数据" / "进度" → `/toefl-dashboard`
+- 用户说"看看数据" / "进度" → 提示用户在终端运行 `bash scripts/dashboard.sh`（打开 http://localhost:5173）
 
 **注意：** 听力作为独立 skill 存在 (`/toefl-listening`)。但听力不是孤立科目——**Writing Integrated 和 Speaking Task 2/3/4 全都依赖听懂讲座/对话**，听力不行这两科直接崩。
 
@@ -172,7 +172,8 @@ EOF
 | `/toefl-speaking` | 4 个 Task 模板 + 笔记框架 + 素材生成 | 「口语模板」「Task 2 准备」「综合口语」 |
 | `/toefl-vocab` | SRS 间隔重复 + 同义替换训练 | 「背单词」「生词本」「同义替换」 |
 | `/toefl-diagnose` | 数据诊断 + 训练计划生成 | 「我该练什么」「给我个计划」 |
-| `/toefl-dashboard` | 启动本地可视化 dashboard | 「打开 dashboard」「看进度」 |
+
+**Dashboard（可视化）：** 在终端运行 `bash scripts/dashboard.sh` → 浏览器打开 http://localhost:5173
 
 ---
 
