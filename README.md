@@ -1,20 +1,20 @@
-# IELTS Claude Skills · v1.0
+# TOEFL Claude Skills · v1.0
 
-> 一套跑在 Claude Code 上的雅思备考 AI 教练 skill。
+> 一套跑在 Claude Code 上的托福备考 AI 教练 skill。
 > **无状态、零依赖、纯文本提示词。** 装上就能用。
 
 ---
 
 ## 这是什么
 
-4 个 [Claude Code Skill](https://docs.claude.com/en/docs/claude-code/skills)，构成一个最小可用的雅思备考助手：
+4 个 [Claude Code Skill](https://docs.claude.com/en/docs/claude-code/skills)，构成一个最小可用的托福备考助手：
 
 | Skill | 干啥 | 触发词 |
 |-------|------|--------|
-| `/ielts` | 路由入口 + 摸底 + 给建议 | 「我要备考雅思」「IELTS」 |
-| `/ielts-writing` | 写作四维批改 + 改写对比 + 审题 | 「批改作文」「帮我看看这篇」 |
-| `/ielts-reading` | 同义替换提取 + T/F/NG 拆解 + 错题诊断 | 「分析阅读」「这道为什么错」 |
-| `/ielts-speaking` | 5 个万能故事覆盖 80% Part 2 话题 | 「口语素材」「Part 2 准备」 |
+| `/toefl` | 路由入口 + 摸底 + 给建议 | 「我要备考托福」「TOEFL」 |
+| `/toefl-reading` | 10 种题型拆解 + 同义替换 + 错题诊断（含 Sentence Simplification / Insert Text / Prose Summary 专项）| 「分析阅读」「这道为什么错」 |
+| `/toefl-writing` | Integrated 综合写作批改 + Academic Discussion 批改 + 审题 | 「批改作文」「综合写作」「论坛帖」 |
+| `/toefl-speaking` | 4 个 Task 模板 + 笔记框架 + 时间分配 + 答案批改 | 「口语模板」「Task 3 准备」「综合口语」 |
 
 **特点：**
 - 完全无状态——不写任何本地文件，每次对话独立
@@ -26,11 +26,9 @@
 
 ## 适合谁
 
-- 备考雅思、想用 AI 当陪练的考生
+- 备考托福、想用 AI 当陪练的考生（特别是目标 100+）
 - 已经在用 Claude Code 的开发者
-- 想看看雅思 skill 怎么写的人（拿去改成自己的版本）
-
-**想要进度追踪、错题本、可视化 Dashboard？** 看下面 [v3.0 完整版](#v10-vs-v30)。
+- 想看看托福 skill 怎么写的人（拿去改成自己的版本）
 
 ---
 
@@ -43,23 +41,23 @@
 
 ```bash
 # Mac / Linux
-cp -r ielts ielts-writing ielts-reading ielts-speaking ~/.claude/skills/
+cp -r toefl toefl-writing toefl-reading toefl-speaking ~/.claude/skills/
 ```
 
 ```powershell
 # Windows PowerShell
-Copy-Item -Recurse ielts, ielts-writing, ielts-reading, ielts-speaking $env:USERPROFILE\.claude\skills\
+Copy-Item -Recurse toefl, toefl-writing, toefl-reading, toefl-speaking $env:USERPROFILE\.claude\skills\
 ```
 
 ### 方法二：克隆
 
 ```bash
-git clone https://github.com/YANZHANLIN/ielts-claude-skills.git
-cd ielts-claude-skills
-cp -r ielts ielts-writing ielts-reading ielts-speaking ~/.claude/skills/
+git clone https://github.com/wcqqq1214/toefl-claude-skills.git
+cd toefl-claude-skills
+cp -r toefl toefl-writing toefl-reading toefl-speaking ~/.claude/skills/
 ```
 
-装完之后重启 Claude Code，输入 `/ielts` 就能用。
+装完之后重启 Claude Code，输入 `/toefl` 就能用。
 
 ---
 
@@ -68,18 +66,19 @@ cp -r ielts ielts-writing ielts-reading ielts-speaking ~/.claude/skills/
 ### 场景 1：什么都不知道，想被引导
 
 ```
-你：/ielts
-AI：（问你 3 个问题：目标分、考试日期、今天想练啥）
+你：/toefl
+AI：（问你 3 个问题：目标分数、考试日期、今天想练啥）
    → 路由到对应的子 skill
 ```
 
 ### 场景 2：直接批改作文
 
 ```
-你：/ielts-writing
-   [粘贴题目 + 你的作文]
+你：/toefl-writing
+   [粘贴题目（阅读段 + 讲座要点，或论坛题 + 同学回复）+ 你的作文]
 AI：
-- 四维评分（TR / CC / LR / GRA）
+- ETS rubric 0-5 打分 + 估算 0-30 分
+- 三点对应检查（Integrated）/ 维度拆分（Academic Discussion）
 - 句子级标注每个问题
 - 改写成目标分数版本
 - 给提分优先级
@@ -88,23 +87,25 @@ AI：
 ### 场景 3：分析阅读错题
 
 ```
-你：/ielts-reading
+你：/toefl-reading
    [粘贴文章 + 题目 + 你的答案 + 标准答案]
 AI：
-- 逐题拆解错因
+- 按 10 种题型分类
+- 逐题拆解错因（Sentence Simplification / Insert Text / Prose Summary 等有专项逻辑）
 - 提取同义替换词表
-- T/F/NG 逻辑分析
+- 错因总结 + 下一步建议
 ```
 
-### 场景 4：准备口语素材
+### 场景 4：准备口语任务
 
 ```
-你：/ielts-speaking
-   "帮我准备 Part 2 描述一次旅行"
+你：/toefl-speaking
+   "帮我准备 Task 3 的答题模板" / "批改我的 Task 2 录音转文字"
 AI：
-- 200-250 词的 Part 2 回答
-- 4-6 个 Part 3 追问预测
-- 关键表达标注
+- 秒级时间分配（15/30 秒准备 → 45/60 秒作答）
+- 笔记模板（综合题必须）
+- 填空式答题框架
+- 改写对比 + 四维 rubric 打分
 ```
 
 ---
@@ -112,11 +113,11 @@ AI：
 ## 文件结构
 
 ```
-ielts-claude-skills/
-├── ielts/SKILL.md              # 路由教练
-├── ielts-writing/SKILL.md      # 写作批改
-├── ielts-reading/SKILL.md      # 阅读分析
-├── ielts-speaking/SKILL.md     # 口语素材
+toefl-claude-skills/
+├── toefl/SKILL.md              # 路由教练
+├── toefl-writing/SKILL.md      # 写作批改（Integrated + Academic Discussion）
+├── toefl-reading/SKILL.md      # 阅读分析（10 种题型）
+├── toefl-speaking/SKILL.md     # 口语 4 个 Task
 ├── README.md                   # 你正在看
 └── LICENSE                     # MIT
 ```
@@ -125,9 +126,21 @@ ielts-claude-skills/
 
 ---
 
-## 怎么改
+## 托福 vs 雅思：改这套 skill 时要注意什么
 
-想改成自己的版本：
+这套基于同作者的 [ielts-claude-skills](https://github.com/YANZHANLIN/ielts-claude-skills) 改写。如果你熟悉雅思版，以下差异要注意：
+
+| 维度 | 雅思版 | 托福版（这里） |
+|------|-------|-------------|
+| 分数 | 9 分制，四科平均取 0.5 | 120 分制，每科 0-30 直接相加 |
+| 阅读题型 | T/F/NG、Matching Headings | 10 种题型，无 T/F/NG，重点是 Sentence Simplification / Insert Text / Prose Summary |
+| 写作 | Task 1 图表 + Task 2 议论文 | Integrated（读+听+写）+ Academic Discussion（论坛帖） |
+| 口语 | 与考官对话，Part 1/2/3 | 全程录音，Task 1 独立 + Task 2-4 综合（读+听+说） |
+| 听力 | 独立训练 | 渗透到 Writing Task 1 和 Speaking Task 2/3/4 |
+
+---
+
+## 怎么改成自己的版本
 
 1. Fork 一份
 2. 改对应的 `SKILL.md`——人格、评分标准、模板都在里面
@@ -136,56 +149,18 @@ ielts-claude-skills/
 
 **常见改法：**
 - 改 SOUL 段落 → 换教练人格
-- 改评分标准表 → 适配托福/GRE
+- 改评分表 → 适配 GRE / GMAT / SAT / 专四专八
 - 改模式表 → 加新的工作流
 - 改边界段 → 调整 skill 之间的分工
 
 ---
 
-## v1.0 vs v3.0
+## 已知限制（v1.0）
 
-这个仓库是 **v1.0（开源免费版）**。完整能力在 **v3.0（付费版99一份不提供试用1.0就是实用版本，加微信的时候备注来意）**。
-
-| | v1.0（开源免费） | v3.0（付费完整版） |
-|--|-----------------|-------------------|
-| Skill 数量 | **4 个**（写作 / 阅读 / 口语 + 路由） | **8 个**（+ 诊断 / 听力 / 词汇 / Dashboard） |
-| 数据持久化 | ❌ 每次对话独立 | ✅ `~/.ielts/` 跨会话记忆 |
-| 批改历史 | ❌ | ✅ 每篇作文自动归档，带评分 |
-| 进度追踪 | ❌ | ✅ 自动统计四科趋势 |
-| 可视化 Dashboard | ❌ | ✅ 本地 React 网页：趋势图 / 雷达图 / 错题热力图 |
-| 错题本 | ❌ | ✅ 自动聚合高频错误标签 |
-| 同义替换库 | 单次输出 | ✅ 跨篇累计，可搜索 |
-| 备考计划 | ❌ | ✅ 数据驱动诊断 + 个人化训练计划 |
-| 听力错题分析 | ❌ | ✅ `/ielts-listening` 题型追踪 + 精听任务 |
-| 词汇训练 | ❌ | ✅ `/ielts-vocab` 间隔重复 + 同义替换专项 |
-| 数据格式校验 | ❌ | ✅ frontmatter + zod schema |
-| 状态栏集成 | ❌ | ✅ Claude Code 底部常驻备考状态 |
-| 备份 / 迁移工具 | ❌ | ✅ 一键 backup / restore / 换电脑 |
-
-### v3.0 长什么样
-
-```
-你（Claude Code 里）
-  ↓ 一句"批改我这篇作文"
-8 个 Skill 协同工作
-  ↓ 写入 ~/.ielts/（你电脑本地，没有云端）
-本地 Dashboard（localhost:5173）
-  ↓ 浏览器打开看
-趋势图 / 雷达图 / 错题分布热力图
-  · 写作分数走势
-  · 四科雷达图对比目标
-  · 高频错误 Top 10
-  · 同义替换累计库
-  · 距离考试天数
-  · 每日建议训练科目
-```
-
-### 想要 v3.0？
-
-- 💬 **微信**：`13258220726`（备注「雅思 v3」）
-- 🛒 **小红书**：搜 `yan的ai世界`，橱窗下单
-
-支持 Windows / Mac / Linux。买完直接发完整 zip 包 + 安装使用说明。
+- **无状态**：每次对话独立，不保留批改历史 / 错题本
+- **无进度追踪**：没有跨会话的分数趋势
+- **无听力 skill**：听力建议直接用 TPO + 精听 + 影子跟读，AI 价值较低
+- **AI 评分偏高**：实战分通常比 AI 评分低 2-3 分（作文）或 0.5 rubric（口语）——交叉验证
 
 ---
 
@@ -199,4 +174,4 @@ ielts-claude-skills/
 
 ## 反馈
 
-发 [issue](https://github.com/YANZHANLIN/ielts-claude-skills/issues) 或者 PR。
+发 issue 或者 PR。
