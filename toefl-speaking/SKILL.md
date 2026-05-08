@@ -355,7 +355,9 @@ This shows [如何支持主题]."
 ### 启动时初始化
 
 ```bash
-bash "$(dirname "$0")/../scripts/init.sh"
+mkdir -p ~/.toefl/{speaking,errors}
+[ ! -f ~/.toefl/speaking/index.json ] && echo '{"entries":[]}' > ~/.toefl/speaking/index.json
+[ ! -f ~/.toefl/errors/tags.json ]    && echo '{"tags":{},"updated_at":""}' > ~/.toefl/errors/tags.json
 ```
 
 ### 每次批改后写入

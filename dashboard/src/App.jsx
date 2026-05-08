@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Countdown from './panels/Countdown.jsx';
-import Radar from './panels/Radar.jsx';
+import SectionRadar from './panels/SectionRadar.jsx';
 import WritingTrend from './panels/WritingTrend.jsx';
 import AccuracyTrend from './panels/AccuracyTrend.jsx';
 import SpeakingRadar from './panels/SpeakingRadar.jsx';
@@ -57,7 +57,7 @@ export default function App() {
 
       <div className="grid">
         <div className="col-4"><Countdown config={data.config} /></div>
-        <div className="col-4"><Radar data={data} /></div>
+        <div className="col-4"><SectionRadar data={data} /></div>
         <div className="col-4"><TodaySuggest data={data} /></div>
 
         <div className="col-6"><WritingTrend entries={data.writing.entries || []} target={data.config?.target_breakdown?.writing} /></div>

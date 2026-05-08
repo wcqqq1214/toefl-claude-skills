@@ -58,7 +58,9 @@ description: |
 ## 启动时初始化
 
 ```bash
-bash "$(dirname "$0")/../scripts/init.sh"
+mkdir -p ~/.toefl/{listening,errors}
+[ ! -f ~/.toefl/listening/index.json ] && echo '{"entries":[]}' > ~/.toefl/listening/index.json
+[ ! -f ~/.toefl/errors/tags.json ]     && echo '{"tags":{},"updated_at":""}' > ~/.toefl/errors/tags.json
 ```
 
 ---

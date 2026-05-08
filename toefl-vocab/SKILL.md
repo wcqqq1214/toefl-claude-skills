@@ -38,7 +38,10 @@ description: |
 ## 启动时初始化
 
 ```bash
-bash "$(dirname "$0")/../scripts/init.sh"
+mkdir -p ~/.toefl/vocab
+[ ! -f ~/.toefl/vocab/srs.json ] && echo '{"queue":[],"updated_at":""}' > ~/.toefl/vocab/srs.json
+mkdir -p ~/.toefl/synonyms
+[ ! -f ~/.toefl/synonyms/library.json ] && echo '{"entries":[],"updated_at":""}' > ~/.toefl/synonyms/library.json
 ```
 
 ---

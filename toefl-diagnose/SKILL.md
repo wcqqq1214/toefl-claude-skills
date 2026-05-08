@@ -27,7 +27,14 @@ description: |
 ### Step 1：初始化 + 读配置
 
 ```bash
-bash "$(dirname "$0")/../scripts/init.sh"
+mkdir -p ~/.toefl/{writing,reading,listening,speaking,errors,synonyms,vocab,plans}
+[ ! -f ~/.toefl/writing/index.json ]    && echo '{"entries":[]}' > ~/.toefl/writing/index.json
+[ ! -f ~/.toefl/reading/index.json ]    && echo '{"entries":[]}' > ~/.toefl/reading/index.json
+[ ! -f ~/.toefl/listening/index.json ]  && echo '{"entries":[]}' > ~/.toefl/listening/index.json
+[ ! -f ~/.toefl/speaking/index.json ]   && echo '{"entries":[]}' > ~/.toefl/speaking/index.json
+[ ! -f ~/.toefl/errors/tags.json ]      && echo '{"tags":{},"updated_at":""}' > ~/.toefl/errors/tags.json
+[ ! -f ~/.toefl/synonyms/library.json ] && echo '{"entries":[],"updated_at":""}' > ~/.toefl/synonyms/library.json
+[ ! -f ~/.toefl/vocab/srs.json ]        && echo '{"queue":[],"updated_at":""}' > ~/.toefl/vocab/srs.json
 
 CONFIG=~/.toefl/config.json
 if [ ! -f "$CONFIG" ]; then

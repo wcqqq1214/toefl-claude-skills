@@ -1,5 +1,5 @@
 import React from 'react';
-import { Radar as RadarChart, RadarChart as RC, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from 'recharts';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from 'recharts';
 
 function avgRubricTo30(entries, getRubric, fallback) {
   if (!entries || entries.length === 0) return fallback ?? null;
@@ -19,7 +19,7 @@ function accuracyTo30(entries, fallback) {
   return Math.round(avg * 30);
 }
 
-export default function Radar({ data }) {
+export default function SectionRadar({ data }) {
   const cfg = data.config;
   const target = cfg?.target_breakdown || {};
   const baseline = cfg?.current_baseline || {};
@@ -45,14 +45,14 @@ export default function Radar({ data }) {
       <h2>四科状态</h2>
       <div style={{ width: '100%', height: 240 }}>
         <ResponsiveContainer>
-          <RC data={chart}>
+          <RadarChart data={chart}>
             <PolarGrid stroke="#242838" />
             <PolarAngleAxis dataKey="subject" tick={{ fill: '#8b93a7', fontSize: 12 }} />
             <PolarRadiusAxis domain={[0, 30]} tick={{ fill: '#8b93a7', fontSize: 10 }} />
-            <RadarChart name="当前" dataKey="current" stroke="#4c9aff" fill="#4c9aff" fillOpacity={0.3} />
-            <RadarChart name="目标" dataKey="target" stroke="#4ade80" fill="#4ade80" fillOpacity={0.1} />
+            <Radar name="当前" dataKey="current" stroke="#4c9aff" fill="#4c9aff" fillOpacity={0.3} />
+            <Radar name="目标" dataKey="target" stroke="#4ade80" fill="#4ade80" fillOpacity={0.1} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
-          </RC>
+          </RadarChart>
         </ResponsiveContainer>
       </div>
     </div>

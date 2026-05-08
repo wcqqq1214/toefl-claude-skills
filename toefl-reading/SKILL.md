@@ -300,7 +300,10 @@ description: |
 ### 启动时初始化
 
 ```bash
-bash "$(dirname "$0")/../scripts/init.sh"
+mkdir -p ~/.toefl/{reading,errors,synonyms}
+[ ! -f ~/.toefl/reading/index.json ]    && echo '{"entries":[]}' > ~/.toefl/reading/index.json
+[ ! -f ~/.toefl/errors/tags.json ]      && echo '{"tags":{},"updated_at":""}' > ~/.toefl/errors/tags.json
+[ ! -f ~/.toefl/synonyms/library.json ] && echo '{"entries":[],"updated_at":""}' > ~/.toefl/synonyms/library.json
 ```
 
 ### 每次分析后写入

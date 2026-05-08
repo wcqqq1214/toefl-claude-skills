@@ -8,3 +8,12 @@ Thumbs.db
 node_modules/
 .env
 .env.local
+
+# Dashboard build artifacts
+dashboard/dist/
+dashboard/.vite/
+dashboard/node_modules/
+
+# Logs and backups
+*.log
+*.tar.gz

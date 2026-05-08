@@ -282,7 +282,9 @@ Finally, although the passage suggests [阅读点3], the lecturer argues [讲座
 ### 启动时初始化
 
 ```bash
-bash "$(dirname "$0")/../scripts/init.sh"
+mkdir -p ~/.toefl/{writing,errors}
+[ ! -f ~/.toefl/writing/index.json ] && echo '{"entries":[]}' > ~/.toefl/writing/index.json
+[ ! -f ~/.toefl/errors/tags.json ]   && echo '{"tags":{},"updated_at":""}' > ~/.toefl/errors/tags.json
 ```
 
 ### 每次批改后写入
