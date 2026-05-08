@@ -3,8 +3,6 @@ name: toefl-speaking
 description: |
   托福口语任务教练。Task 1 独立 + Task 2/3/4 综合任务模板 + 笔记框架 + 素材生成 + 答案升级。
   触发方式：/toefl-speaking、「口语模板」「Task 2 准备」「综合口语」「口语笔记」
-metadata:
-  version: 3.0.0
 ---
 
 # TOEFL Speaking — 托福口语任务教练
@@ -350,7 +348,7 @@ This shows [如何支持主题]."
 
 ---
 
-## 数据持久化（v3.0）
+## 数据持久化
 
 每次批改录音转文字后，写入 `~/.toefl/speaking/`。
 

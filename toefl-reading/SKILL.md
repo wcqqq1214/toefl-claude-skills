@@ -3,8 +3,6 @@ name: toefl-reading
 description: |
   托福阅读精读教练。10 种题型拆解 + 同义替换提取 + 错题诊断 + 句子简化和 Insert Text 专项。
   触发方式：/toefl-reading、「分析阅读」「这题为什么错」「Insert Text」「Prose Summary」
-metadata:
-  version: 3.0.0
 ---
 
 # TOEFL Reading — 托福阅读精读教练
@@ -295,7 +293,7 @@ metadata:
 
 ---
 
-## 数据持久化（v3.0）
+## 数据持久化
 
 所有分析完成后，写入 `~/.toefl/reading/`。Dashboard 和 diagnose 依赖这些数据。
 

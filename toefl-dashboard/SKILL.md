@@ -3,8 +3,6 @@ name: toefl-dashboard
 description: |
   托福 Dashboard 启动器。启动本地 React + Vite 可视化面板，展示训练数据、趋势、错题分布、倒计时。
   触发方式：/toefl-dashboard、「打开 dashboard」「看我的数据」「进度可视化」
-metadata:
-  version: 3.0.0
 ---
 
 # TOEFL Dashboard — 数据可视化启动器

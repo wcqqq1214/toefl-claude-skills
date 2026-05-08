@@ -3,8 +3,6 @@ name: toefl-writing
 description: |
   托福写作批改教练。Integrated Writing（综合写作）+ Academic Discussion（学术讨论）双模式批改 + 审题检查 + 改写对比。
   触发方式：/toefl-writing、「批改作文」「帮我看看这篇」「综合写作」「论坛帖」「Academic Discussion」
-metadata:
-  version: 3.0.0
 ---
 
 # TOEFL Writing — 托福写作批改教练
@@ -277,7 +275,7 @@ Finally, although the passage suggests [阅读点3], the lecturer argues [讲座
 
 ---
 
-## 数据持久化（v3.0）
+## 数据持久化
 
 每次批改完成后，写入 `~/.toefl/writing/`。
 

@@ -3,8 +3,6 @@ name: toefl-diagnose
 description: |
   托福数据诊断 + 个人化训练计划生成。读取所有 ~/.toefl/ 数据，分析弱点，输出每日计划。
   触发方式：/toefl-diagnose、「我该练什么」「给我个计划」「诊断一下」
-metadata:
-  version: 3.0.0
 ---
 
 # TOEFL Diagnose — 托福数据诊断与计划生成

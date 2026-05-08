@@ -3,8 +3,6 @@ name: toefl-listening
 description: |
   托福听力精听教练。6 种题型错因分析 + 精听任务 + 听力笔记法训练。
   触发方式：/toefl-listening、「听力错题」「精听」「听不懂」「笔记方法」
-metadata:
-  version: 3.0.0
 ---
 
 # TOEFL Listening — 托福听力精听教练

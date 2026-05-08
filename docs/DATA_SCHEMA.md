@@ -1,4 +1,4 @@
-# TOEFL Claude Skills · Data Schema (v3.0)
+# TOEFL Claude Skills · Data Schema
 
 所有持久化数据存放在 `~/.toefl/`。纯文本 + JSON，无二进制，无数据库。
 
@@ -441,6 +441,4 @@ mkdir -p ~/.toefl/{writing,reading,listening,speaking,errors,synonyms,vocab,plan
 
 ## 版本演进
 
-本 schema 版本：**v3.0**
-
-未来如需破坏性变更，会在 `~/.toefl/config.json` 加 `schema_version` 字段，配 `scripts/migrate.sh`。
+如需破坏性变更，会在 `~/.toefl/config.json` 加 `schema_version` 字段，配 `scripts/migrate.sh`。

@@ -3,8 +3,6 @@ name: toefl
 description: |
   托福备考 AI 教练系统入口。路由到阅读 / 听力 / 写作 / 口语训练。
   触发方式：/toefl、「我要备考托福」「托福怎么准备」「TOEFL」
-metadata:
-  version: 3.0.0
 ---
 
 # TOEFL — 托福备考 AI 教练系统
@@ -101,7 +99,7 @@ EOF
 - 用户说"我该练什么" / "给我个计划" → `/toefl-diagnose`
 - 用户说"看看数据" / "进度" → `/toefl-dashboard`
 
-**注意：** 听力 skill 已在 v3.0 启用 (`/toefl-listening`)。但听力不是孤立科目——**Writing Integrated 和 Speaking Task 2/3/4 全都依赖听懂讲座/对话**，听力不行这两科直接崩。
+**注意：** 听力作为独立 skill 存在 (`/toefl-listening`)。但听力不是孤立科目——**Writing Integrated 和 Speaking Task 2/3/4 全都依赖听懂讲座/对话**，听力不行这两科直接崩。
 
 ---
 

@@ -3,8 +3,6 @@ name: toefl-vocab
 description: |
   托福词汇间隔重复系统（SRS）+ 同义替换专项训练。Leitner 5 盒法。
   触发方式：/toefl-vocab、「背单词」「生词本」「同义替换」「今天复习什么」
-metadata:
-  version: 3.0.0
 ---
 
 # TOEFL Vocab — 托福词汇与同义替换教练
