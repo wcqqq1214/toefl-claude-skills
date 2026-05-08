@@ -1,166 +1,254 @@
-# TOEFL Claude Skills · v1.0
+# TOEFL Claude Skills · v3.0
 
-> 一套跑在 Claude Code 上的托福备考 AI 教练 skill。
-> **无状态、零依赖、纯文本提示词。** 装上就能用。
+> 一套跑在 Claude Code 上的托福备考 AI 教练系统。
+> **数据驱动、个人化训练、可视化。** 装上就能用。
+
+---
+
+## v3.0 带来了什么
+
+v1.0 是一套无状态的 skill 集合。v3.0 把它升级成**有状态的备考系统**：
+
+| 能力 | v1.0 | v3.0 |
+|------|------|------|
+| 批改 / 分析 | ✓ | ✓ |
+| **听力 skill** | ✗ | ✓ |
+| **数据持久化**（错题本、作文归档）| ✗ | ✓ |
+| **词汇 SRS**（间隔重复）| ✗ | ✓ |
+| **数据诊断 + 计划生成** | ✗ | ✓ |
+| **可视化 Dashboard**（React + Vite）| ✗ | ✓ |
+| **状态栏集成** | ✗ | ✓ |
+| **备份 / 恢复** | ✗ | ✓ |
 
 ---
 
 ## 这是什么
 
-4 个 [Claude Code Skill](https://docs.claude.com/en/docs/claude-code/skills)，构成一个最小可用的托福备考助手：
+7 个 [Claude Code Skill](https://docs.claude.com/en/docs/claude-code/skills) + 1 个 Dashboard + 脚本工具链，构成一个完整的托福备考助手：
 
 | Skill | 干啥 | 触发词 |
 |-------|------|--------|
-| `/toefl` | 路由入口 + 摸底 + 给建议 | 「我要备考托福」「TOEFL」 |
-| `/toefl-reading` | 10 种题型拆解 + 同义替换 + 错题诊断（含 Sentence Simplification / Insert Text / Prose Summary 专项）| 「分析阅读」「这道为什么错」 |
-| `/toefl-writing` | Integrated 综合写作批改 + Academic Discussion 批改 + 审题 | 「批改作文」「综合写作」「论坛帖」 |
-| `/toefl-speaking` | 4 个 Task 模板 + 笔记框架 + 时间分配 + 答案批改 | 「口语模板」「Task 3 准备」「综合口语」 |
+| `/toefl` | 路由入口 + 摸底 + 写入 config | 「我要备考托福」「TOEFL」 |
+| `/toefl-reading` | 10 种题型拆解 + 同义替换 + 错题诊断 | 「分析阅读」「这道为什么错」 |
+| `/toefl-listening` | 6 种题型错因三分诊断 + 精听任务 + 笔记法 | 「听力错题」「精听」 |
+| `/toefl-writing` | Integrated + Academic Discussion 批改 | 「批改作文」「综合写作」 |
+| `/toefl-speaking` | 4 个 Task 模板 + 笔记框架 + 批改 | 「口语模板」「Task 3 准备」 |
+| `/toefl-vocab` | SRS 间隔重复 + 同义替换训练 | 「背单词」「同义替换」 |
+| `/toefl-diagnose` | 数据驱动诊断 + 个人化计划 | 「我该练什么」「给我个计划」 |
+| `/toefl-dashboard` | 启动本地可视化面板 | 「打开 dashboard」 |
 
-**特点：**
-- 完全无状态——不写任何本地文件，每次对话独立
-- 无依赖——纯 markdown 提示词，无 npm、无 Python、无数据库
+**系统特点：**
+- 数据本地化存储在 `~/.toefl/`（纯 JSON + markdown，人类可读）
+- Dashboard 只读本地文件，无网络请求
+- 每个 skill 独立，可以单独用
 - 中文交互 + 英文术语
-- MIT License，随便改
-
----
-
-## 适合谁
-
-- 备考托福、想用 AI 当陪练的考生（特别是目标 100+）
-- 已经在用 Claude Code 的开发者
-- 想看看托福 skill 怎么写的人（拿去改成自己的版本）
+- MIT License
 
 ---
 
 ## 安装
 
 ### 前提
-你要先装好 [Claude Code](https://docs.claude.com/en/docs/claude-code)。
+- [Claude Code](https://docs.claude.com/en/docs/claude-code) 已安装
+- Node.js v18+（仅 Dashboard 需要）
+- `jq`（所有 skill 都用到，macOS: `brew install jq`，Linux: `apt install jq`）
 
-### 方法一：直接复制
-
-```bash
-# Mac / Linux
-cp -r toefl toefl-writing toefl-reading toefl-speaking ~/.claude/skills/
-```
-
-```powershell
-# Windows PowerShell
-Copy-Item -Recurse toefl, toefl-writing, toefl-reading, toefl-speaking $env:USERPROFILE\.claude\skills\
-```
-
-### 方法二：克隆
+### Step 1：安装 skill
 
 ```bash
 git clone https://github.com/wcqqq1214/toefl-claude-skills.git
 cd toefl-claude-skills
-cp -r toefl toefl-writing toefl-reading toefl-speaking ~/.claude/skills/
+
+# 复制 7 个 skill 到 Claude Code 目录
+cp -r toefl toefl-reading toefl-listening toefl-writing toefl-speaking \
+      toefl-vocab toefl-diagnose toefl-dashboard ~/.claude/skills/
 ```
 
-装完之后重启 Claude Code，输入 `/toefl` 就能用。
+### Step 2：初始化数据目录
+
+```bash
+bash scripts/init.sh
+```
+
+执行完会创建 `~/.toefl/` 及其子目录。
+
+### Step 3：（可选）装 Dashboard 依赖
+
+```bash
+cd dashboard
+npm install
+```
+
+### Step 4：（可选）启用状态栏
+
+在 `~/.claude/settings.json` 加：
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash /absolute/path/to/toefl-claude-skills/scripts/statusline.sh"
+  }
+}
+```
+
+重启 Claude Code，输入 `/toefl` 开始。
 
 ---
 
-## 怎么用
+## 快速开始
 
-### 场景 1：什么都不知道，想被引导
+### 1. 摸底（30 秒）
 
 ```
 你：/toefl
-AI：（问你 3 个问题：目标分数、考试日期、今天想练啥）
-   → 路由到对应的子 skill
+AI：问 3 个问题 — 目标分 / 考试日期 / 现在水平
+    自动写入 ~/.toefl/config.json
 ```
 
-### 场景 2：直接批改作文
+### 2. 练一个（30 分钟）
 
 ```
 你：/toefl-writing
-   [粘贴题目（阅读段 + 讲座要点，或论坛题 + 同学回复）+ 你的作文]
+   [粘贴 Integrated 题目 + 你写的作文]
 AI：
-- ETS rubric 0-5 打分 + 估算 0-30 分
-- 三点对应检查（Integrated）/ 维度拆分（Academic Discussion）
+- ETS rubric 0-5 打分 + 估 0-30 分
+- 三点对应检查
 - 句子级标注每个问题
 - 改写成目标分数版本
-- 给提分优先级
+- 自动归档到 ~/.toefl/writing/
 ```
 
-### 场景 3：分析阅读错题
+### 3. 看数据（1 分钟）
 
-```
-你：/toefl-reading
-   [粘贴文章 + 题目 + 你的答案 + 标准答案]
-AI：
-- 按 10 种题型分类
-- 逐题拆解错因（Sentence Simplification / Insert Text / Prose Summary 等有专项逻辑）
-- 提取同义替换词表
-- 错因总结 + 下一步建议
+```bash
+cd dashboard && npm run dev
+# 打开 http://localhost:5173
 ```
 
-### 场景 4：准备口语任务
+看到：
+- 倒计时 + 进度条
+- 四科雷达图（当前 vs 目标）
+- 写作趋势线
+- 阅读/听力正确率
+- 口语四维雷达
+- 高频错题 Top 10
+- 词汇 SRS 状态
+- 同义替换库
+
+### 4. 要计划（5 秒）
 
 ```
-你：/toefl-speaking
-   "帮我准备 Task 3 的答题模板" / "批改我的 Task 2 录音转文字"
-AI：
-- 秒级时间分配（15/30 秒准备 → 45/60 秒作答）
-- 笔记模板（综合题必须）
-- 填空式答题框架
-- 改写对比 + 四维 rubric 打分
+你：/toefl-diagnose
+AI：分析 ~/.toefl/ 所有数据
+    输出: 当前估分 / 瓶颈分析 / 今日 3 小时计划 / 里程碑预警
+    自动保存到 ~/.toefl/plans/YYYY-MM-DD.md
 ```
 
 ---
 
-## 文件结构
+## 架构
 
 ```
 toefl-claude-skills/
-├── toefl/SKILL.md              # 路由教练
-├── toefl-writing/SKILL.md      # 写作批改（Integrated + Academic Discussion）
-├── toefl-reading/SKILL.md      # 阅读分析（10 种题型）
-├── toefl-speaking/SKILL.md     # 口语 4 个 Task
-├── README.md                   # 你正在看
-└── LICENSE                     # MIT
+├── toefl/                      # 路由 + 摸底 + config 写入
+├── toefl-reading/              # 阅读批改（10 题型）
+├── toefl-listening/            # 听力精听 + 错因三分诊断
+├── toefl-writing/              # 写作批改（Integrated + AD）
+├── toefl-speaking/             # 口语 4 Task 模板 + 批改
+├── toefl-vocab/                # 词汇 SRS + 同义替换
+├── toefl-diagnose/             # 数据分析 + 计划生成
+├── toefl-dashboard/            # Dashboard 启动器
+├── dashboard/                  # React + Vite 可视化
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── panels/             # 9 个面板组件
+│   │   └── style.css
+│   ├── vite.config.js          # 本地 API middleware
+│   └── package.json
+├── scripts/
+│   ├── init.sh                 # 初始化 ~/.toefl/
+│   ├── backup.sh               # 打 tar.gz 备份
+│   ├── restore.sh              # 从备份恢复
+│   └── statusline.sh           # Claude Code 状态栏
+├── docs/
+│   └── DATA_SCHEMA.md          # JSON schema 完整文档
+├── README.md
+└── LICENSE
 ```
 
-每个 skill 就是一个文件夹 + 一个 `SKILL.md`。Claude Code 通过 `name` 字段识别和触发。
+### 数据流
+
+```
+用户在 Claude Code
+  ↓ /toefl-writing 批改作文
+skill 写入:
+  ~/.toefl/writing/YYYY-MM-DD-tHH-MM-integrated.md    ← markdown 归档
+  ~/.toefl/writing/index.json                         ← 索引（追加一条）
+  ~/.toefl/errors/tags.json                           ← 错题标签聚合
+  ↓
+/toefl-diagnose 读所有 index.json + tags.json
+  ↓ 分析瓶颈
+  ↓ 生成计划到 ~/.toefl/plans/YYYY-MM-DD.md
+  ↓
+Dashboard (Vite dev server) 通过 /api/* 读同一批文件
+  ↓ 渲染图表
+```
+
+所有数据见 [docs/DATA_SCHEMA.md](./docs/DATA_SCHEMA.md)。
 
 ---
 
-## 托福 vs 雅思：改这套 skill 时要注意什么
+## 数据备份
 
-这套基于同作者的 [ielts-claude-skills](https://github.com/YANZHANLIN/ielts-claude-skills) 改写。如果你熟悉雅思版，以下差异要注意：
+```bash
+# 备份（保留最近 10 份）
+bash scripts/backup.sh
+# → ~/.toefl/backups/toefl-backup-2026-05-08-150000.tar.gz
 
-| 维度 | 雅思版 | 托福版（这里） |
-|------|-------|-------------|
+# 恢复
+bash scripts/restore.sh
+# → 交互式选择
+```
+
+---
+
+## 托福 vs 雅思：这套和雅思版的差异
+
+这套源自同作者的 [ielts-claude-skills](https://github.com/YANZHANLIN/ielts-claude-skills) fork。核心差异：
+
+| 维度 | 雅思版 | 托福版 |
+|------|-------|--------|
 | 分数 | 9 分制，四科平均取 0.5 | 120 分制，每科 0-30 直接相加 |
 | 阅读题型 | T/F/NG、Matching Headings | 10 种题型，无 T/F/NG，重点是 Sentence Simplification / Insert Text / Prose Summary |
-| 写作 | Task 1 图表 + Task 2 议论文 | Integrated（读+听+写）+ Academic Discussion（论坛帖） |
-| 口语 | 与考官对话，Part 1/2/3 | 全程录音，Task 1 独立 + Task 2-4 综合（读+听+说） |
-| 听力 | 独立训练 | 渗透到 Writing Task 1 和 Speaking Task 2/3/4 |
+| 写作 | Task 1 图表 + Task 2 议论文 | Integrated（读+听+写）+ Academic Discussion（论坛帖）|
+| 口语 | 与考官对话 | 全程录音，Task 1 独立 + Task 2-4 综合 |
+| 听力 | 独立训练 | 渗透到 Writing Integrated 和 Speaking Task 2/3/4 |
+
+---
+
+## 已知限制
+
+- **Dashboard 只读**：可视化不能直接操作数据，所有数据变更经 skill
+- **单用户**：`~/.toefl/` 是单用户目录，不支持多账号
+- **AI 评分偏高**：实战分通常比 AI 评分低 2-3 分（作文）或 0.5 rubric（口语）
+- **SRS 简化实现**：Leitner 5 盒法，不是完整 SM-2 算法
+- **打包的 dashboard/dist 不能用**：静态文件无法读本地 JSON，必须跑 dev server
 
 ---
 
 ## 怎么改成自己的版本
 
 1. Fork 一份
-2. 改对应的 `SKILL.md`——人格、评分标准、模板都在里面
-3. 重新复制到 `~/.claude/skills/`
-4. 重启 Claude Code
+2. 改对应的 `SKILL.md`（人格、评分标准、模板）
+3. 改 `docs/DATA_SCHEMA.md` 和各 skill 的"数据持久化"段落同步 schema
+4. 改 `dashboard/src/panels/*` 适配新数据
+5. 重新复制到 `~/.claude/skills/`
 
 **常见改法：**
-- 改 SOUL 段落 → 换教练人格
-- 改评分表 → 适配 GRE / GMAT / SAT / 专四专八
-- 改模式表 → 加新的工作流
-- 改边界段 → 调整 skill 之间的分工
-
----
-
-## 已知限制（v1.0）
-
-- **无状态**：每次对话独立，不保留批改历史 / 错题本
-- **无进度追踪**：没有跨会话的分数趋势
-- **无听力 skill**：听力建议直接用 TPO + 精听 + 影子跟读，AI 价值较低
-- **AI 评分偏高**：实战分通常比 AI 评分低 2-3 分（作文）或 0.5 rubric（口语）——交叉验证
+- GRE / GMAT / SAT：改分数体系 + 题型
+- 雅思：换回 9 分制 + T/F/NG 逻辑
+- 单人训练 → 团队：加 `user_id` 字段到所有 JSON
 
 ---
 
@@ -168,10 +256,10 @@ toefl-claude-skills/
 
 [MIT](./LICENSE)
 
-随便用、随便改、随便商用。注明出处不强制但欢迎。
+随便用、随便改、随便商用。
 
 ---
 
 ## 反馈
 
-发 issue 或者 PR。
+Issue 或 PR。

@@ -4,7 +4,7 @@ description: |
   托福阅读精读教练。10 种题型拆解 + 同义替换提取 + 错题诊断 + 句子简化和 Insert Text 专项。
   触发方式：/toefl-reading、「分析阅读」「这题为什么错」「Insert Text」「Prose Summary」
 metadata:
-  version: 1.0.0
+  version: 3.0.0
 ---
 
 # TOEFL Reading — 托福阅读精读教练
@@ -292,3 +292,96 @@ metadata:
 - 你不做规划 → `/toefl`
 - 你不生成口语素材 → `/toefl-speaking`
 - 精读训练不直接给答案——引导式教学
+
+---
+
+## 数据持久化（v3.0）
+
+所有分析完成后，写入 `~/.toefl/reading/`。Dashboard 和 diagnose 依赖这些数据。
+
+### 启动时初始化
+
+```bash
+bash "$(dirname "$0")/../scripts/init.sh"
+```
+
+### 每次分析后写入
+
+```bash
+ID="$(date +%Y-%m-%d-t%H-%M)-{source-slug}"
+DATE="$(date -Iseconds)"
+
+# 1. 追加索引
+ENTRY=$(jq -n \
+  --arg id "$ID" --arg date "$DATE" \
+  --arg source "{e.g. TPO 42 Passage 1}" \
+  --arg topic "{e.g. volcanic eruptions}" \
+  --argjson total {total} --argjson correct {correct} \
+  --argjson wrong '{[q numbers]}' \
+  --argjson types '{error type counts object}' \
+  '{id:$id, date:$date, source:$source, topic:$topic,
+    total_questions:$total, correct:$correct,
+    wrong_questions:$wrong, error_types:$types,
+    file: ("reading/" + $id + ".md")}')
+
+jq ".entries += [$ENTRY]" ~/.toefl/reading/index.json > /tmp/r.json && \
+  mv /tmp/r.json ~/.toefl/reading/index.json
+
+# 2. 写 markdown 归档
+cat > ~/.toefl/reading/$ID.md <<EOF
+---
+id: $ID
+date: $DATE
+source: {source}
+topic: {topic}
+total_questions: {total}
+correct: {correct}
+wrong_questions: {[...]}
+error_types:
+  sentence_simplification: {x}
+  insert_text: {x}
+  ...
+---
+
+## 文章
+{原文}
+
+## 错题分析
+{Phase 2 完整内容}
+
+## 同义替换表
+{Phase 3 完整表格}
+EOF
+
+# 3. 更新 errors/tags.json（每个错题类型）
+for tag in {遍历 error_types}; do
+  jq --arg t "$tag" --arg date "$DATE" '
+    .tags[$t].count = ((.tags[$t].count // 0) + 1) |
+    .tags[$t].sections = ((.tags[$t].sections // []) + ["reading"] | unique) |
+    .tags[$t].last_seen = $date |
+    .updated_at = $date
+  ' ~/.toefl/errors/tags.json > /tmp/t.json && mv /tmp/t.json ~/.toefl/errors/tags.json
+done
+
+# 4. 更新 synonyms/library.json（同义替换累积）
+for pair in {遍历本次提取的同义对}; do
+  TOPIC="{topic_word}"; SOURCE="{source_word}"
+  EXISTS=$(jq --arg t "$TOPIC" --arg s "$SOURCE" \
+    '.entries | map(select(.topic_word == $t and .source_word == $s)) | length' \
+    ~/.toefl/synonyms/library.json)
+  if [ "$EXISTS" = "0" ]; then
+    jq --arg t "$TOPIC" --arg s "$SOURCE" --arg c "{context}" \
+       --arg today "$(date +%Y-%m-%d)" '
+      .entries += [{topic_word:$t, source_word:$s, context:$c,
+                    section:"reading", first_seen:$today, last_seen:$today, count:1}]
+    ' ~/.toefl/synonyms/library.json > /tmp/s.json && mv /tmp/s.json ~/.toefl/synonyms/library.json
+  else
+    jq --arg t "$TOPIC" --arg s "$SOURCE" --arg today "$(date +%Y-%m-%d)" '
+      (.entries[] | select(.topic_word == $t and .source_word == $s)) |=
+        (.count += 1 | .last_seen = $today)
+    ' ~/.toefl/synonyms/library.json > /tmp/s.json && mv /tmp/s.json ~/.toefl/synonyms/library.json
+  fi
+done
+```
+
+写入完成后告诉用户：`✓ 已归档到 ~/.toefl/reading/{ID}.md`。

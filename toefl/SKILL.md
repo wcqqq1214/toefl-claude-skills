@@ -4,7 +4,7 @@ description: |
   托福备考 AI 教练系统入口。路由到阅读 / 听力 / 写作 / 口语训练。
   触发方式：/toefl、「我要备考托福」「托福怎么准备」「TOEFL」
 metadata:
-  version: 1.0.0
+  version: 3.0.0
 ---
 
 # TOEFL — 托福备考 AI 教练系统
@@ -29,6 +29,12 @@ metadata:
 
 ## 路由流程
 
+### Step 0：初始化数据目录
+
+```bash
+bash "$(dirname "$0")/../scripts/init.sh"
+```
+
 ### Step 1：快速摸底（3 个问题）
 
 依次问：
@@ -39,6 +45,42 @@ metadata:
    - A. 我要练阅读
    - B. 我要练写作
    - C. 我要练口语
+   - D. 我要练听力
+   - E. 我要背单词
+   - F. 诊断 + 出计划
+
+### Step 1.5：写入配置
+
+回答完后，把信息持久化到 `~/.toefl/config.json`：
+
+```bash
+cat > ~/.toefl/config.json <<EOF
+{
+  "target_score": {TARGET},
+  "target_breakdown": {
+    "reading": {R},
+    "listening": {L},
+    "speaking": {S},
+    "writing": {W}
+  },
+  "exam_date": "{YYYY-MM-DD}",
+  "current_baseline": {
+    "reading": {CR},
+    "listening": {CL},
+    "speaking": {CS},
+    "writing": {CW},
+    "total": {CTOTAL},
+    "measured_at": "$(date +%Y-%m-%d)"
+  },
+  "daily_hours": {HOURS},
+  "weakest_section": "{SECTION}",
+  "notes": "",
+  "updated_at": "$(date -Iseconds)"
+}
+EOF
+```
+
+如果 `config.json` 已存在 → 告诉用户"已有配置"并读出来确认，问是否要更新。
 
 ### Step 2：路由
 
@@ -47,13 +89,19 @@ metadata:
 | A | `/toefl-reading` | 阅读错题分析 + 题型拆解 |
 | B | `/toefl-writing` | 写作批改（Integrated + Academic Discussion） |
 | C | `/toefl-speaking` | 口语 Task 1-4 模板 + 答题素材 |
+| D | `/toefl-listening` | 听力错题分析 + 精听任务 |
+| E | `/toefl-vocab` | SRS 间隔重复 + 同义替换训练 |
+| F | `/toefl-diagnose` | 数据诊断 + 训练计划生成 |
 
 智能识别：
 - 用户没选直接丢了一篇作文 → 直接进 `/toefl-writing`
 - 用户丢了阅读文章和题目 → 直接进 `/toefl-reading`
 - 用户问 Task 1 / Task 2 独立题 / 综合口语 → 直接进 `/toefl-speaking`
+- 用户丢了听力转录 → `/toefl-listening`
+- 用户说"我该练什么" / "给我个计划" → `/toefl-diagnose`
+- 用户说"看看数据" / "进度" → `/toefl-dashboard`
 
-**注意：** 听力单独的 skill 未开放。听力训练建议用 TPO + 精听 + 影子跟读。但听力不是孤立科目——**Writing Task 1 和 Speaking Task 2/3/4 全都依赖听懂讲座/对话**，听力不行这两科直接崩。
+**注意：** 听力 skill 已在 v3.0 启用 (`/toefl-listening`)。但听力不是孤立科目——**Writing Integrated 和 Speaking Task 2/3/4 全都依赖听懂讲座/对话**，听力不行这两科直接崩。
 
 ---
 
@@ -121,8 +169,12 @@ metadata:
 | 命令 | 功能 | 触发词 |
 |------|------|--------|
 | `/toefl-reading` | 10 种题型拆解 + 同义替换 + 错题诊断 | 「分析阅读」「这题为什么错」「Insert Text」 |
+| `/toefl-listening` | 6 种题型错因三分诊断 + 精听任务 + 笔记法 | 「听力错题」「精听」「听不懂」 |
 | `/toefl-writing` | Integrated 批改 + Academic Discussion 批改 + 审题 | 「批改作文」「综合写作」「论坛帖」 |
 | `/toefl-speaking` | 4 个 Task 模板 + 笔记框架 + 素材生成 | 「口语模板」「Task 2 准备」「综合口语」 |
+| `/toefl-vocab` | SRS 间隔重复 + 同义替换训练 | 「背单词」「生词本」「同义替换」 |
+| `/toefl-diagnose` | 数据诊断 + 训练计划生成 | 「我该练什么」「给我个计划」 |
+| `/toefl-dashboard` | 启动本地可视化 dashboard | 「打开 dashboard」「看进度」 |
 
 ---
 

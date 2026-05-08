@@ -4,7 +4,7 @@ description: |
   托福写作批改教练。Integrated Writing（综合写作）+ Academic Discussion（学术讨论）双模式批改 + 审题检查 + 改写对比。
   触发方式：/toefl-writing、「批改作文」「帮我看看这篇」「综合写作」「论坛帖」「Academic Discussion」
 metadata:
-  version: 1.0.0
+  version: 3.0.0
 ---
 
 # TOEFL Writing — 托福写作批改教练
@@ -274,3 +274,90 @@ Finally, although the passage suggests [阅读点3], the lecturer argues [讲座
 - 你不做整体规划 → `/toefl`
 - 你不分析阅读题 → `/toefl-reading`
 - 你不做口语任务 → `/toefl-speaking`
+
+---
+
+## 数据持久化（v3.0）
+
+每次批改完成后，写入 `~/.toefl/writing/`。
+
+### 启动时初始化
+
+```bash
+bash "$(dirname "$0")/../scripts/init.sh"
+```
+
+### 每次批改后写入
+
+```bash
+ID="$(date +%Y-%m-%d-t%H-%M)-{integrated|academic-discussion}"
+DATE="$(date -Iseconds)"
+
+# 1. 追加索引
+ENTRY=$(jq -n \
+  --arg id "$ID" --arg date "$DATE" \
+  --arg task "{integrated|academic_discussion}" \
+  --arg topic "{main topic}" \
+  --argjson wc {word_count} \
+  --argjson rs {rubric_score} \
+  --argjson est {estimated_30} \
+  --argjson issues '{["tag1", "tag2"]}' \
+  --argjson target {target_30_for_writing} \
+  '{id:$id, date:$date, task_type:$task, topic:$topic,
+    word_count:$wc, rubric_score:$rs, estimated_30:$est,
+    issues:$issues, target_score:$target,
+    file: ("writing/" + $id + ".md")}')
+
+jq ".entries += [$ENTRY]" ~/.toefl/writing/index.json > /tmp/w.json && \
+  mv /tmp/w.json ~/.toefl/writing/index.json
+
+# 2. 写 markdown 归档
+cat > ~/.toefl/writing/$ID.md <<EOF
+---
+id: $ID
+date: $DATE
+task_type: {integrated|academic_discussion}
+topic: {topic}
+word_count: {word_count}
+rubric_score: {rubric_score}
+estimated_30: {estimated_30}
+issues: {[...]}
+---
+
+## 题目
+{原题}
+
+## 用户作文
+{原文}
+
+## 批改报告
+{Phase 1-6 完整输出}
+
+## 改写对比
+{高分版本}
+EOF
+
+# 3. 更新 errors/tags.json（issues 标签）
+for tag in {遍历 issues}; do
+  jq --arg t "$tag" --arg date "$DATE" '
+    .tags[$t].count = ((.tags[$t].count // 0) + 1) |
+    .tags[$t].sections = ((.tags[$t].sections // []) + ["writing"] | unique) |
+    .tags[$t].last_seen = $date |
+    .updated_at = $date
+  ' ~/.toefl/errors/tags.json > /tmp/t.json && mv /tmp/t.json ~/.toefl/errors/tags.json
+done
+```
+
+### 标签命名规范（writing）
+
+- `lecture_point_N_missing` - Integrated 漏了讲座某点（N=1/2/3）
+- `lecture_info_distorted` - 扭曲了讲座信息
+- `personal_opinion_in_integrated` - Integrated 里写了个人观点（严重扣分）
+- `word_count_low` - 字数不足
+- `no_specific_example` - Academic Discussion 缺具体例子
+- `template_detected` - 模板痕迹过重
+- `pronoun_reference_unclear` - 代词指代不清
+- `repeated_vocab` - 词汇重复
+- `tense_error` - 时态错误
+
+完成后告诉用户：`✓ 已归档到 ~/.toefl/writing/{ID}.md`。

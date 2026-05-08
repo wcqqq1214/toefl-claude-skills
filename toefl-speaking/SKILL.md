@@ -4,7 +4,7 @@ description: |
   托福口语任务教练。Task 1 独立 + Task 2/3/4 综合任务模板 + 笔记框架 + 素材生成 + 答案升级。
   触发方式：/toefl-speaking、「口语模板」「Task 2 准备」「综合口语」「口语笔记」
 metadata:
-  version: 1.0.0
+  version: 3.0.0
 ---
 
 # TOEFL Speaking — 托福口语任务教练
@@ -347,3 +347,67 @@ This shows [如何支持主题]."
 - 你不批改作文 → `/toefl-writing`
 - 你不分析阅读 → `/toefl-reading`
 - 你的工作：框架、模板、笔记方法、批改转文字
+
+---
+
+## 数据持久化（v3.0）
+
+每次批改录音转文字后，写入 `~/.toefl/speaking/`。
+
+### 启动时初始化
+
+```bash
+bash "$(dirname "$0")/../scripts/init.sh"
+```
+
+### 每次批改后写入
+
+```bash
+ID="$(date +%Y-%m-%d-t%H-%M)-task{N}"
+DATE="$(date -Iseconds)"
+
+# 1. 追加索引
+ENTRY=$(jq -n \
+  --arg id "$ID" --arg date "$DATE" \
+  --argjson task {1|2|3|4} \
+  --arg topic "{e.g. bystander effect}" \
+  --argjson dur {estimated_duration_sec} \
+  --argjson wc {word_count} \
+  --argjson rs '{"general":3, "delivery":3, "language":2, "topic_development":2.5}' \
+  --argjson overall {综合 rubric 0-4} \
+  --argjson est {estimated_30} \
+  --argjson issues '{["tag1","tag2"]}' \
+  '{id:$id, date:$date, task:$task, topic:$topic,
+    duration_sec:$dur, word_count:$wc,
+    rubric_scores:$rs, overall_rubric:$overall, estimated_30:$est,
+    issues:$issues, file: ("speaking/" + $id + ".md")}')
+
+jq ".entries += [$ENTRY]" ~/.toefl/speaking/index.json > /tmp/sp.json && \
+  mv /tmp/sp.json ~/.toefl/speaking/index.json
+
+# 2. 写 markdown 归档（与 reading/writing 同模式，略）
+
+# 3. 更新 errors/tags.json（issues）
+for tag in {遍历 issues}; do
+  jq --arg t "$tag" --arg date "$DATE" '
+    .tags[$t].count = ((.tags[$t].count // 0) + 1) |
+    .tags[$t].sections = ((.tags[$t].sections // []) + ["speaking"] | unique) |
+    .tags[$t].last_seen = $date |
+    .updated_at = $date
+  ' ~/.toefl/errors/tags.json > /tmp/t.json && mv /tmp/t.json ~/.toefl/errors/tags.json
+done
+```
+
+### 标签命名规范（speaking）
+
+- `missing_example_detail` - 例子太简略
+- `repeated_vocab` - 词汇单调
+- `long_pause` - 频繁长停顿
+- `timing_under_40s` / `timing_under_55s` - 时长不够
+- `task_incomplete` - 没讲完被切断
+- `listening_info_missing` - Task 2/3/4 漏讲座信息
+- `reading_info_missing` - Task 2/3 漏阅读信息
+- `off_topic` - 跑题
+- `template_detected` - 模板痕迹过重
+- `grammar_error_frequent` - 语法错误多
+- `unclear_structure` - 结构不清
