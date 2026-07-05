@@ -5,7 +5,7 @@ export default function AccuracyTrend({ reading, listening }) {
   if ((!reading || reading.length === 0) && (!listening || listening.length === 0)) {
     return (
       <div className="panel">
-        <h2>阅读 / 听力正确率</h2>
+        <h2>阅读 / 听力练习正确率</h2>
         <div className="empty">暂无数据。</div>
       </div>
     );
@@ -34,7 +34,7 @@ export default function AccuracyTrend({ reading, listening }) {
 
   return (
     <div className="panel">
-      <h2>阅读 / 听力正确率 (%)</h2>
+      <h2>阅读 / 听力练习正确率 (%)</h2>
       <div style={{ width: '100%', height: 240 }}>
         <ResponsiveContainer>
           <LineChart data={merged}>

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# TOEFL Claude Skills - 从备份恢复 ~/.toefl/
+# TOEFL 2026 Skills - 从备份恢复 ~/.toefl/
 # 用法: ./restore.sh [backup-file.tar.gz]
 # 不带参数则列出最近备份让用户选
 

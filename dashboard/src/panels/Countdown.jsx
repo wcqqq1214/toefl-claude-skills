@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatBand, toTotalBand } from '../score.js';
 
 export default function Countdown({ config }) {
   if (!config || !config.target_score) {
@@ -15,18 +16,19 @@ export default function Countdown({ config }) {
   const exam = exam_date ? new Date(exam_date) : null;
   const days = exam ? Math.ceil((exam - today) / (1000 * 60 * 60 * 24)) : null;
 
-  const current = current_baseline?.total ?? null;
-  const diff = current != null ? target_score - current : null;
-  const progress = current != null ? Math.min(100, (current / target_score) * 100) : 0;
+  const targetBand = toTotalBand(target_score);
+  const current = toTotalBand(current_baseline?.total);
+  const diff = current != null && targetBand != null ? targetBand - current : null;
+  const progress = current != null && targetBand != null ? Math.min(100, (current / targetBand) * 100) : 0;
 
   return (
     <div className="panel">
       <h2>目标 / 倒计时</h2>
       <div className="big-num">
-        {current ?? '—'}<span className="slash"> / {target_score}</span>
+        {formatBand(current)}<span className="slash"> / {formatBand(targetBand)}</span>
       </div>
       <div className="sub">
-        {diff != null && diff > 0 && <span className="pill warn">差 {diff} 分</span>}
+        {diff != null && diff > 0 && <span className="pill warn">差 {diff.toFixed(1)} band</span>}
         {diff != null && diff <= 0 && <span className="pill ok">已达标</span>}
         {' '}
         {days != null && (

@@ -1,22 +1,11 @@
 import React from 'react';
-
-function accuracyTo30(entries, fallback) {
-  if (!entries || entries.length === 0) return fallback ?? null;
-  const recent = entries.slice(-5);
-  const rates = recent.map((e) => e.correct / e.total_questions).filter((v) => !isNaN(v));
-  if (rates.length === 0) return fallback ?? null;
-  const avg = rates.reduce((a, b) => a + b, 0) / rates.length;
-  return Math.round(avg * 30);
-}
-
-function rubricTo30(entries, getRubric, factor, fallback) {
-  if (!entries || entries.length === 0) return fallback ?? null;
-  const recent = entries.slice(-5);
-  const vals = recent.map(getRubric).filter((v) => v != null);
-  if (vals.length === 0) return fallback ?? null;
-  const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
-  return Math.round(avg * factor);
-}
+import {
+  accuracyToBand,
+  averageEntryBand,
+  speakingEntryBand,
+  toSectionBand,
+  writingEntryBand,
+} from '../score.js';
 
 export default function TodaySuggest({ data }) {
   const cfg = data.config;
@@ -32,16 +21,16 @@ export default function TodaySuggest({ data }) {
   const baseline = cfg.current_baseline || {};
   const target = cfg.target_breakdown;
 
-  const rEst = accuracyTo30(data.reading.entries, baseline.reading);
-  const lEst = accuracyTo30(data.listening.entries, baseline.listening);
-  const wEst = rubricTo30(data.writing.entries, (e) => e.rubric_score, 6, baseline.writing);
-  const sEst = rubricTo30(data.speaking.entries, (e) => e.overall_rubric, 7.5, baseline.speaking);
+  const rEst = accuracyToBand(data.reading.entries, baseline.reading, 'reading');
+  const lEst = accuracyToBand(data.listening.entries, baseline.listening, 'listening');
+  const wEst = averageEntryBand(data.writing.entries, writingEntryBand, baseline.writing, 'writing');
+  const sEst = averageEntryBand(data.speaking.entries, speakingEntryBand, baseline.speaking, 'speaking');
 
   const gaps = [
-    { sec: 'reading', gap: (target.reading || 0) - (rEst || 0), skill: '/toefl-reading' },
-    { sec: 'listening', gap: (target.listening || 0) - (lEst || 0), skill: '/toefl-listening' },
-    { sec: 'writing', gap: (target.writing || 0) - (wEst || 0), skill: '/toefl-writing' },
-    { sec: 'speaking', gap: (target.speaking || 0) - (sEst || 0), skill: '/toefl-speaking' },
+    { sec: 'reading', gap: (toSectionBand('reading', target.reading) || 0) - (rEst || 0), skill: '/toefl-reading' },
+    { sec: 'listening', gap: (toSectionBand('listening', target.listening) || 0) - (lEst || 0), skill: '/toefl-listening' },
+    { sec: 'writing', gap: (toSectionBand('writing', target.writing) || 0) - (wEst || 0), skill: '/toefl-writing' },
+    { sec: 'speaking', gap: (toSectionBand('speaking', target.speaking) || 0) - (sEst || 0), skill: '/toefl-speaking' },
   ].sort((a, b) => b.gap - a.gap);
 
   const top = gaps[0];
@@ -61,27 +50,27 @@ export default function TodaySuggest({ data }) {
         焦点: {top.sec}
       </div>
       <div className="sub" style={{ marginBottom: 12 }}>
-        差距 {top.gap} 分 · <code>{top.skill}</code>
+        差距 {top.gap.toFixed(1)} band · <code>{top.skill}</code>
       </div>
 
       <ul className="tasks">
         <li>
-          <span>🎯 {top.sec} 专项训练</span>
+          <span>{top.sec} 专项训练</span>
           <span className="muted">~60 min</span>
         </li>
         <li>
-          <span>📚 词汇 SRS 复习</span>
+          <span>词汇 SRS 复习</span>
           <span className="muted">{vocabDue} 词 / ~20 min</span>
         </li>
         {gaps[1].gap > 1 && (
           <li>
-            <span>⚡ {gaps[1].sec} 次要训练</span>
+            <span>{gaps[1].sec} 次要训练</span>
             <span className="muted">~40 min</span>
           </li>
         )}
         {data.synonyms.entries?.length > 30 && (
           <li>
-            <span>🔁 同义替换训练</span>
+            <span>同义替换训练</span>
             <span className="muted">~15 min</span>
           </li>
         )}
@@ -89,7 +78,7 @@ export default function TodaySuggest({ data }) {
 
       {days != null && days < 30 && (
         <div className="pill danger" style={{ marginTop: 12 }}>
-          距考试 {days} 天 — 优先刷错题不新题
+          距考试 {days} 天，优先复盘错题
         </div>
       )}
 

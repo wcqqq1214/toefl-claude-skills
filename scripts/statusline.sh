@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# TOEFL Claude Skills - Claude Code statusLine 集成
-# 读取 ~/.toefl/config.json，输出一行摘要给状态栏
-# 在 ~/.claude/settings.json 中配置：
+# TOEFL 2026 Skills - statusLine 集成
+# 读取 ~/.toefl/config.json，输出一行 1-6 band 摘要给状态栏
+# Claude Code 可在 ~/.claude/settings.json 中配置：
 #   "statusLine": { "type": "command", "command": "bash /path/to/statusline.sh" }
 
 set -e
@@ -18,7 +18,7 @@ WEAK=$(jq -r '.weakest_section // ""' "$CONFIG")
 
 DAYS=""
 if [ -n "$EXAM" ]; then
-  EXAM_TS=$(date -d "$EXAM" +%s 2>/dev/null || echo "")
+  EXAM_TS=$(date -d "$EXAM" +%s 2>/dev/null || date -j -f "%Y-%m-%d" "$EXAM" +%s 2>/dev/null || echo "")
   NOW_TS=$(date +%s)
   if [ -n "$EXAM_TS" ]; then
     DIFF=$(( (EXAM_TS - NOW_TS) / 86400 ))
@@ -26,7 +26,7 @@ if [ -n "$EXAM" ]; then
   fi
 fi
 
-# 简短格式: TOEFL 84→100 D-99 [weak:speaking]
+# 简短格式: TOEFL 4.0→5.0 D-99 [weak:speaking]
 OUT="TOEFL $CURRENT→$TARGET$DAYS"
 [ -n "$WEAK" ] && [ "$WEAK" != "null" ] && OUT="$OUT [weak:$WEAK]"
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "TOEFL Diagnose"
+  short_description: "读取 TOEFL 数据并生成今日训练计划"
+  default_prompt: "Use $toefl-diagnose to analyze my TOEFL 2026 progress and make today's plan."

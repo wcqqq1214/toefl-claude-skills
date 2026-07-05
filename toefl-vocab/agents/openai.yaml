@@ -1,0 +1,4 @@
+interface:
+  display_name: "TOEFL Vocab"
+  short_description: "TOEFL 词汇 SRS 和同义替换训练"
+  default_prompt: "Use $toefl-vocab to review my TOEFL vocabulary due today."

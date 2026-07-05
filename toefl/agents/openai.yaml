@@ -1,0 +1,4 @@
+interface:
+  display_name: "TOEFL 2026"
+  short_description: "TOEFL 2026 备考入口和路由"
+  default_prompt: "Use $toefl to set up my TOEFL 2026 target band and route me to the right practice."

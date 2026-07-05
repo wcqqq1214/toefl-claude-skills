@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# TOEFL Claude Skills - 备份 ~/.toefl/ 到 tar.gz
+# TOEFL 2026 Skills - 备份 ~/.toefl/ 到 tar.gz
 
 set -e
 

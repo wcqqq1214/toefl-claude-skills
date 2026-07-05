@@ -1,0 +1,4 @@
+interface:
+  display_name: "TOEFL Reading"
+  short_description: "新版 TOEFL 阅读错题和自适应训练"
+  default_prompt: "Use $toefl-reading to analyze my TOEFL 2026 Reading mistakes."

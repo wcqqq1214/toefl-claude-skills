@@ -1,0 +1,4 @@
+interface:
+  display_name: "TOEFL Speaking"
+  short_description: "新版 TOEFL 口语复述和面试训练"
+  default_prompt: "Use $toefl-speaking to review my TOEFL 2026 Speaking transcript."

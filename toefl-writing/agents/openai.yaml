@@ -1,0 +1,4 @@
+interface:
+  display_name: "TOEFL Writing"
+  short_description: "新版 TOEFL 写作批改和句子训练"
+  default_prompt: "Use $toefl-writing to correct my TOEFL 2026 Writing response."

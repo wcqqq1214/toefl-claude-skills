@@ -1,0 +1,4 @@
+interface:
+  display_name: "TOEFL Listening"
+  short_description: "新版 TOEFL 听力错题、精听和笔记"
+  default_prompt: "Use $toefl-listening to diagnose my TOEFL 2026 Listening mistakes."

@@ -51,7 +51,7 @@ export default function App() {
 
       {configMissing && (
         <div className="panel" style={{ marginBottom: 16 }}>
-          <div className="error">尚未初始化配置。请先在 Claude Code 运行 <code>/toefl</code> 完成摸底。</div>
+          <div className="error">尚未初始化配置。请先在 Codex App 或 Claude Code 运行 <code>/toefl</code> 完成摸底。</div>
         </div>
       )}
 

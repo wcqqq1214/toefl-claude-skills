@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# TOEFL Claude Skills - Dashboard 启动器（用户脚本）
+# TOEFL 2026 Skills - Dashboard 启动器（用户脚本）
 # 不是 skill，直接 bash 跑
 
 set -e
